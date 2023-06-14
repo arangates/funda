@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 1m
+
+scrape_configs:
+
+  - job_name: 'funda-exporter'
+    scrape_interval: 30m
+    scrape_timeout: 29m
+    static_configs:
+    - targets: ['funda-exporter:2112']

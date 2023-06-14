@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+
+  vmagent:
+    container_name: vmagent
+    image: victoriametrics/vmagent:v1.86.1
+    depends_on:
+      - "vmsingle"
+    ports:
+      - 8429:8429
+    volumes:
+      - ./data/vmagent/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--promscrape.config=/etc/prometheus/prometheus.yml"
+      - "--promscrape.configCheckInterval=1m"
+      - "--remoteWrite.url=http://vmsingle:8428/api/v1/write"
+    restart: always
+
+  vmsingle:
+    container_name: vmsingle
+    image: victoriametrics/victoria-metrics:v1.86.1
+    ports:
+      - 8428:8428
+    command:
+      - "--storageDataPath=/storage"
+      - "--httpListenAddr=:8428"
+      - "--retentionPeriod=48"
+    restart: always
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:9.3.6
+    depends_on:
+      - "vmsingle"
+    ports:
+      - 3000:3000
+    restart: always
+
+  funda-exporter:
+    container_name: funda-exporter
+    restart: always
+    image: vladikamira/funda-exporter:v0.0.3
+    command:
+      - '-scrapeDelayMilliseconds=500'
+      - '-fundaSearchUrl=https://www.funda.nl/koop/gemeente-veldhoven/375000-400000/woonhuis/'
+      - '-listenAddress=:2112'
+    ports:
+      - 2112:2112
+    depends_on:
+      - "vmagent"
+    environment:
+      - GOMAXPROCS=1
