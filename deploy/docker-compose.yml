@@ -39,7 +39,7 @@ services:
   funda-exporter:
     container_name: funda-exporter
     restart: always
-    image: vladikamira/funda-exporter:v0.0.3
+    image: arangates/funda:latest
     command:
       - '-scrapeDelayMilliseconds=500'
       - '-fundaSearchUrl=https://www.funda.nl/koop/gemeente-veldhoven/375000-400000/woonhuis/'
